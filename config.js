@@ -8,7 +8,7 @@
 var ftconfigs = {
    roomName: "Fuzzy Robot Disco Bear", // what you'd like your room name to be displayed as
    roomNameShort: "FRDB", // if you have a long room name, put a shorter version here (like 2 words probably max).
-   defaultAlbumArtUrl: "", // url of an image to use for tracks with no album art. should be a square and at least 500x500 px for best results.
+   defaultAlbumArtUrl: "http://cyancey76.github.io/img/discoball.png", // url of an image to use for tracks with no album art. should be a square and at least 500x500 px for best results.
    roomInfoUrl: "https://www.fuzzyrobotdiscobear.com/music/", // Change what the "?" button at the top of the page links to. This can be any URL
    firebase:{ // put the info from your Firebase app here. can be found in the Firebase console
     apiKey: "AIzaSyDQWEtmBPi7w_R0-foS1WnDvBqKg9rgXcQ",
