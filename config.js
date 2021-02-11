@@ -15,6 +15,6 @@ var ftconfigs = {
     authDomain: "fuzzy-robot-disco-bear.firebaseapp.com",
     databaseURL: "https://fuzzy-robot-disco-bear-default-rtdb.firebaseio.com/"
   },
-  youtubeKey: "AIzaSyCfmjYmviYnOvnlUDsAbb2l3w7Pg7Cgz9M", // Your youtube api client key. Be sure to whitelist your domain for this key in the google api console.
+  youtubeKey: "AIzaSyAYcWJHwxxgyQaBN34joYOghOKGLCU6qxM", // Your youtube api client key. Be sure to whitelist your domain for this key in the google api console.
   soundcloudKey: "587aa2d384f7333a886010d5f52f302a" // Your soundcloud api key
 };
