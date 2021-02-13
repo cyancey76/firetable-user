@@ -51,7 +51,7 @@ if (typeof ftconfigs == "undefined") throw "config.js is missing! Copy config.js
 var chatScroll = new SimpleBar(document.getElementById('chatsWrap'));
 chatScroll.getScrollElement(); //.addEventListener('scroll', function(){ console.log(chatScroll); });
 
-firetable.version = "01.08.6";
+firetable.version = "01.08.9";
 var player, $playlistItemTemplate;
 
 var idlejs = new IdleJs({
@@ -187,7 +187,6 @@ firetable.init = function() {
       'left': $('#grab').offset().left - 16
     });
     setup();
-    firetable.utilities.scrollToBottom();
   }, 500));
   firetable.utilities.scrollToBottom();
   var widgetIframe = document.getElementById('sc-widget');
@@ -307,7 +306,6 @@ firetable.actions = {
       $("#mainGrid").append("<div id=\"login\" data-simplebar>" + firetable.loginForm + "</div>");
 
       firetable.ui.loginEventsInit();
-      // simplebar scroll
     }
   },
   logIn: function(email, password) {
@@ -327,7 +325,6 @@ firetable.actions = {
     firetable.debug && console.log("user signed in!");
     if ($("#login").html()) {
       firetable.loginForm = $("#login").html();
-      // destroy login simplebar scroll?
       firetable.ui.loginEventsDestroy();
       $("#login").remove();
     }
@@ -566,7 +563,6 @@ firetable.actions = {
         $(q).hide()
       }
     });
-    // simplebar scroll update?
   },
   muteToggle: function(zeroMute) {
 
@@ -1624,6 +1620,7 @@ firetable.ui = {
           } else {
             $("#firstPlay").text("");
           }
+          var doTheScrollThing = firetable.utilities.isChatPrettyMuchAtBottom();
           if (showPlaycount) {
             $("#playCount").text(data.adamData.playcount + " plays");
             $(".npmsg" + data.cid).last().html("<div class=\"npmsg\">DJ <strong>" + nicename + "</strong> started playing <strong>" + data.adamData.track_name + "</strong> by <strong>" + data.adamData.artist + "</strong><br/>This song has been played " + data.adamData.playcount + " times.</div>");
@@ -1631,8 +1628,7 @@ firetable.ui = {
             $("#playCount").text("");
             $(".npmsg" + data.cid).last().html("<div class=\"npmsg\">DJ <strong>" + nicename + "</strong> started playing <strong>" + data.adamData.track_name + "</strong> by <strong>" + data.adamData.artist + "</strong></div>");
           }
-          if (firetable.utilities.isChatPrettyMuchAtBottom()) firetable.utilities.scrollToBottom();
-          window.dispatchEvent(new Event('resize'));
+          if (doTheScrollThing) firetable.utilities.scrollToBottom();
         }
       }
     });
@@ -1729,13 +1725,13 @@ firetable.ui = {
         if (firetable.nonpmsg) {
           firetable.nonpmsg = false;
         } else {
+          var doTheScrollThing = firetable.utilities.isChatPrettyMuchAtBottom();
           if (showPlaycount) {
             $("#chats").append("<div class=\"newChat nowplayn npmsg" + data.cid + "\"><div class=\"npmsg\">DJ <strong>" + nicename + "</strong> started playing <strong>" + data.title + "</strong> by <strong>" + data.artist + "</strong><br/>This song has been played " + firetable.tagUpdate.adamData.playcount + " times.</div>")
           } else {
             $("#chats").append("<div class=\"newChat nowplayn npmsg" + data.cid + "\"><div class=\"npmsg\">DJ <strong>" + nicename + "</strong> started playing <strong>" + data.title + "</strong> by <strong>" + data.artist + "</strong></div>")
           }
-          // simplebar scroll update?
-          if (firetable.utilities.isChatPrettyMuchAtBottom()) firetable.utilities.scrollToBottom();
+          if (doTheScrollThing) firetable.utilities.scrollToBottom();
           firetable.lastChatPerson = false;
           firetable.lastChatId = false;
         }
@@ -1795,7 +1791,9 @@ firetable.ui = {
           firetable.debug && console.log('waitlist', data);
           if (data.hasOwnProperty(key)) {
             cnt = countr;
-            ok1 += "<div class=\"prson\"><div class=\"botson\" style=\"background-image:url(https://indiediscotheque.com/robots/" + data[key].id + "" + data[key].name + ".png?size=110x110);\"></div><span class=\"prsnName\">" + countr + ". " + data[key].name + "</span></div>";
+            var removeMe = "";
+            if (data[key].removeAfter) removeMe = "departure_board"
+            ok1 += "<div class=\"prson\"><div class=\"botson\" style=\"background-image:url(https://indiediscotheque.com/robots/" + data[key].id + "" + data[key].name + ".png?size=110x110);\"></div><span class=\"prsnName\">" + countr + ". " + data[key].name + " <span class=\"removemeIcon material-icons\"> " + removeMe + " </span></span></div>";
             countr++;
           }
         }
@@ -1809,7 +1807,10 @@ firetable.ui = {
         var countr = 0;
         for (var key in data) {
           if (data.hasOwnProperty(key)) {
-            ok1 += "<div id=\"spt" + countr + "\" class=\"spot\"><div class=\"avtr\" id=\"avtr" + countr + "\" style=\"background-image: url(https://indiediscotheque.com/robots/" + data[key].id + "" + data[key].name + ".png?size=110x110);\"></div><div id=\"djthing" + countr + "\" class=\"djplaque\"><div class=\"djname\">" + data[key].name + "</div><div class=\"playcount\">" + data[key].plays + "/<span id=\"plimit" + countr + "\">" + firetable.playlimit + "</span></div></div></div>";
+            var removeMe = "";
+            if (data[key].removeAfter) removeMe = "departure_board"
+
+            ok1 += "<div id=\"spt" + countr + "\" class=\"spot\"><div class=\"avtr\" id=\"avtr" + countr + "\" style=\"background-image: url(https://indiediscotheque.com/robots/" + data[key].id + "" + data[key].name + ".png?size=110x110);\"></div><div id=\"djthing" + countr + "\" class=\"djplaque\"><div class=\"djname\"><span class=\"removemeIcon material-icons\"> " + removeMe + " </span> " + data[key].name + "</div><div class=\"playcount\">" + data[key].plays + "/<span id=\"plimit" + countr + "\">" + firetable.playlimit + "</span></div></div></div>";
             countr++;
           }
         }
@@ -2143,15 +2144,6 @@ firetable.ui = {
           });
           $('#mainqueue').append($newli);
         }
-      }
-      // if this is a different list, reset scrollerboy
-      if (firetable.listShowing) {
-        if (firetable.listShowing !== listID) {
-          // queuelist simplebar scroll update?
-        }
-      } else {
-        firetable.listShowing = listID;
-        // queuelist simplebar scroll update?
       }
     });
 
